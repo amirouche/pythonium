@@ -48,7 +48,7 @@ def pythonium_generate_js(filepath, translator_class, requirejs=False, root_path
     translator = translator_class()
     translator.visit(tree)
     script = translator.writer.value()
-    if requirejs:
+    if False:
         out = 'define(function(require) {\n'
         out += script
         if isinstance(translator.__all__, str):

@@ -11,7 +11,6 @@ from subprocess import check_output
 from subprocess import CalledProcessError
 
 from pythonium.main import main
-from pythonium.veloce.veloce import Veloce
 from pythonium.compliant.compliant import Compliant
 from pythonium.utils import pythonium_generate_js
 
@@ -45,18 +44,15 @@ def compare_output(expected, result):
     return list(diffs)
 
 
-def run(test, filepath, mode):
+def run(test, filepath):
     global ok_ctr, test_ctr
-    print('> Running {} in {} mode.'.format(test, mode))
+    print('> running ', filepath)
     test_ctr += 1
-    ext = 'exec-{}.js'.format(mode)
+    ext = 'exec-{}.js'.format('compliant')
     exec_script = os.path.join(TMPDIR, test + ext)
     with open(exec_script, 'w') as f:
-        if mode =='veloce':
-            translator=Veloce
-        else:
-            f.write(COMPLIANTJS)
-            translator=Compliant
+        f.write(COMPLIANTJS)
+        translator = Compliant
         try:
             pythonium_generate_js(filepath, translator, output=f)
         except Exception as exc:
@@ -65,13 +61,20 @@ def run(test, filepath, mode):
             return
 
     try:
-        result = check_output(['node', '--harmony', exec_script], stderr=STDOUT)
+        result = check_output(
+            [
+                '/home/amirouche/opt/node-v0.12.0/node',
+                '--harmony',
+                exec_script
+            ],
+            stderr=STDOUT
+        )
     except CalledProcessError as err:
         print(err.output.decode(errors='replace'))
         print('< ERROR :(')
         return
 
-    expected_file = os.path.join(os.path.dirname(filepath), test+'.expected')
+    expected_file = os.path.join(os.path.dirname(filepath), test + '.expected')
     if os.path.exists(expected_file):
         with open(expected_file, 'br') as f:
             expected = f.read()
@@ -108,41 +111,20 @@ def run_python(test, filepath):
         ok_ctr += 1
 
 if __name__ == '__main__':
-
     TMPDIR = os.path.join(TESTS_ROOT, 'tmp')
     try:
         os.mkdir(TMPDIR)
     except OSError:
         pass
 
-    # solo mode
-    if len(sys.argv) > 1:
-        for path in sys.argv[1:]:
-            if 'python' in path:
-                run_python(path, path)
-            else:
-                if 'compliant' in path:
-                    modes = ('compliant',)
-                else:
-                    modes = ('veloce', 'compliant')
-                name = os.path.basename(path)
-                for mode in modes:
-                    run(name, path, mode)
-    else:
-        for mode in ('veloce', 'compliant'):
-            print('* Running tests for {} mode'.format(mode))
-            for test in os.listdir(TESTS_ROOT):
-                if test.endswith('.py'):
-                    filepath = os.path.join(TESTS_ROOT, test)
-                    run(test, filepath, mode)
-        for test in os.listdir(COMPLIANT_TESTS_ROOT):
-            if test.endswith('.py'):
-                filepath = os.path.join(COMPLIANT_TESTS_ROOT, test)
-                run(test, filepath, mode)
-        print('* Running python tests')
-        for test in os.listdir(PYTHON_TESTS_ROOT):
-            if test.endswith('.py'):
-                run_python(test, os.path.join(PYTHON_TESTS_ROOT, test))
+    for test in os.listdir(TESTS_ROOT):
+        if test.endswith('.py'):
+            filepath = os.path.join(TESTS_ROOT, test)
+            run(test, filepath)
+    # print('* Running python tests')
+    # for test in os.listdir(PYTHON_TESTS_ROOT):
+    #     if test.endswith('.py'):
+    #         run_python(test, os.path.join(PYTHON_TESTS_ROOT, test))
     print("= Passed {}/{} tests".format(ok_ctr, test_ctr))
     if (ok_ctr - test_ctr) != 0:
         sys.exit(1)

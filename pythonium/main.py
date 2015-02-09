@@ -39,9 +39,10 @@ def main(argv=None):
         # runtime is built separatly
         # it must appear first in the file
         # and it must be built using veloce mode
+        from pythonium.dodge import dodge
         path = compliant.__path__[0]
-        argv = ['--veloce', os.path.join(path, 'runtime.py')]
-        main(argv)
+        filepath = os.path.join(path, 'runtime.py')
+        dodge(filepath, sys.stdout)
 
         # compile builtins
         for path in builtins.__path__:

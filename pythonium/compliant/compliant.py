@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import sys
 from collections import namedtuple
@@ -16,6 +17,7 @@ from ast import NodeVisitor
 
 from ..utils import YieldSearch, Writer
 from ..veloce.veloce import Veloce
+
 
 ClassDefNode = namedtuple('ClassDef', 'name')
 FunctionDefNode = namedtuple('FunctionDef', 'name')
@@ -365,6 +367,16 @@ class Compliant(NodeVisitor):
     # arg = (identifier arg, expr? annotation)
     visit_arg = NotImplemented
 
+    def visit_NameConstant(self, node):
+        if node.value == True:
+            return '__TRUE'
+        elif node.value == False:
+            return '__FALSE'
+        elif node.value == None:
+            return '__NONE'
+        else:
+            raise NotImplementedError(node.value)
+    
     # Name(identifier id, expr_context ctx)
     def visit_Name(self, node):
         if node.id == 'None':
@@ -861,8 +873,8 @@ class Compliant(NodeVisitor):
             self.writer.write('__args = __args.splice({});'.format(len(args)))
             if varkwargs and (varkwargs != '__kwargs' or kwargs):
                 self.writer.write('if (varkwargs_start) {{ __args.splice(varkwargs_start - {}) }}'.format(len(args)))
-            self.writer.write('var {} = pythonium_call(tuple);'.format(varargs))
-            self.writer.write('{}.jsobject = __args;'.format(varargs))
+            self.writer.write('var {} = pythonium_call(tuple);'.format(varargs.arg))
+            self.writer.write('{}.jsobject = __args;'.format(varargs.arg))
         self.writer.write('/* END arguments unpacking */')
 
 
