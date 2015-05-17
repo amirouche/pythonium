@@ -343,7 +343,7 @@ class Compliant(NodeVisitor):
         start = self.visit(node.lower) if node.lower else 'undefined'
         end = self.visit(node.upper) if node.upper else 'undefined'
         step = self.visit(node.step) if node.step else 'undefined'
-        return 'slice({}, {}, {})'.format(start, step, end)
+        return 'pythonium_call(slice, {}, {}, {})'.format(start, step, end)
 
     # Index(expr value)
     def visit_Index(self, node):
