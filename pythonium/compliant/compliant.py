@@ -91,6 +91,10 @@ class Compliant(NodeVisitor):
     # withitem = (expr context_expr, expr? optional_vars)
     ######################################################################
 
+
+    def NotImplemented(self, node):
+        raise NotImplementedError(node)
+    
     # Interactive(stmt* body)
     visit_Interactive = NotImplemented
 
@@ -839,7 +843,8 @@ class Compliant(NodeVisitor):
         self.writer.write('/* BEGIN arguments unpacking */')
         if not varkwargs and kwargs:
             varkwargs = '__kwargs'
-
+        elif varkwargs:
+            varkwargs = varkwargs.arg
         if varargs or (varkwargs and varkwargs != '__kwargs') or kwargs:
             self.writer.write('var __args = Array.prototype.slice.call(arguments);')
         if (varkwargs and varkwargs != '__kwargs') or kwargs:
