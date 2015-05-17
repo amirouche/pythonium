@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from setuptools import setup
 
-from pythonium.main import __version__
+from pythonium import __version__
 
 
 setup(
