@@ -93,7 +93,7 @@ class Compliant(NodeVisitor):
 
 
     def NotImplemented(self, node):
-        raise NotImplementedError(node)
+        raise NotImplementedError(node, node.lineno)
     
     # Interactive(stmt* body)
     visit_Interactive = NotImplemented
@@ -160,7 +160,9 @@ class Compliant(NodeVisitor):
         return '__rcontains__'
 
     # NotIn
-    visit_NotIn = NotImplemented
+    # visit_NotIn = NotImplemented
+    def visit_NotIn(self, node):
+        return '__rnotin__'
 
     # Module(stmt* body)
     def visit_Module(self, node):

@@ -25,7 +25,7 @@ from .veloce.veloce import Veloce
 from .compliant.compliant import Compliant
 from .utils import pythonium_generate_js
 
-__version__ = '0.6.3-dev'
+__version__ = '0.6.3'
 
 
 def main(argv=None):

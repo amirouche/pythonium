@@ -67,6 +67,10 @@ class list:
         length = jscode('jsobject.length')
         return int(length)
 
+    def __notin__(self, element):
+        isin = element in self
+        return not isin
+
     def __iter__(self):
         return ListIterator(self)
 

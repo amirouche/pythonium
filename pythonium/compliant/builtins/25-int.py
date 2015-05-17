@@ -85,6 +85,9 @@ class int:
             return True
         return False
 
+    def __rnotin__(self, other):
+        return other.__notin__(self)
+    
     def __neq__(self, other):
         return not self.__eq__(other)
 
