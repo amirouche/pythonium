@@ -5,6 +5,6 @@ print(a[2])
 a[2] = a[1]+a[0]+a[2]
 print(a[2])
 s = ['works']
-print(s[1])
-print(s[:-2])
-print(s[2:])
+print(s[0])
+# print(s[:-2])
+# print(s[2:])
