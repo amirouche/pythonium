@@ -4,7 +4,6 @@ import sys
 import difflib
 from io import StringIO
 from traceback import print_exc
-from itertools import chain
 
 from subprocess import STDOUT
 from subprocess import check_output
@@ -63,7 +62,7 @@ def run(test, filepath):
     try:
         result = check_output(
             [
-                '/home/amirouche/opt/node-v0.12.0/node',
+                'nodejs',
                 '--harmony',
                 exec_script
             ],
