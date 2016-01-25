@@ -22,7 +22,7 @@ PYTHON_TESTS_ROOT = os.path.join(TESTS_ROOT, 'python')
 # generate pythonium compliant library
 stdout = sys.stdout
 sys.stdout = StringIO()
-main(['--generate'])
+main(['--runtime'])
 COMPLIANTJS = sys.stdout.getvalue()
 sys.stdout = stdout
 

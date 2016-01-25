@@ -1,29 +1,20 @@
 #!/usr/bin/env python3
-"""pythonium
-
-Usage: pythonium [-h][-d][-r][-V] [FILE ...] [-o FILE] | [-g]
+"""Usage: pythonium [-h]|[-v]|[-r]|[FILE]
 
 Options:
   -h --help        show this
   -v --version     show version
-  -V --veloce      use veloce mode, generated code is faster but least compliant
-  -o --output FILE specify output file [default: stdout]
-  -d --deep        generate file dependencies. If --output is not provided, 
-                   it will generate for each source file a coresponding .js file.
-  -r --requirejs   generate requirejs compatible module
-  -g --generate    generate pythonium runtime (exclusive option)
+  -r --runtime     output pythonium runtime (exclusive option)
 
-The default mode, without -V or --veloce option is *experimental*.
-
-If you generate code without -V or --veloce you will need to use the library 
-generated with -g or --generate option to run the code.
+You will need to use the library generated with -r or --runtime
+option to run the code.
 """
 import os
 import sys
+from ast import parse
 
-from .veloce.veloce import Veloce
 from .compliant.compliant import Compliant
-from .utils import pythonium_generate_js
+
 
 from . import __version__
 
@@ -31,18 +22,18 @@ from . import __version__
 def main(argv=None):
     from docopt import docopt
     args = docopt(__doc__, argv, version='pythonium ' + __version__)
-    if args['--generate']:
+    if not args['--runtime'] and not args['FILE']:
+        main(['-h'])
+        sys.exit(1)
+
+    if args['--runtime']:
         # call ourself for each file in pythonium.lib:
-        from pythonium import compliant
         from pythonium.compliant import builtins
 
-        # runtime is built separatly
-        # it must appear first in the file
-        # and it must be built using veloce mode
-        from pythonium.dodge import dodge
-        path = compliant.__path__[0]
-        filepath = os.path.join(path, 'runtime.py')
-        dodge(filepath, sys.stdout)
+        path = os.path.dirname(__file__)
+        filepath = os.path.join(path, 'pythonium.js')
+        with open(filepath) as f:
+            print(f.read())
 
         # compile builtins
         for path in builtins.__path__:
@@ -52,25 +43,19 @@ def main(argv=None):
                     main(argv)
         return
 
-    filepaths = args['FILE']
-    if not filepaths:
-        main(['--help'])
-        return
+    filepath = args['FILE']
+    dirname = os.path.abspath(os.path.dirname(filepath))
+    basename = os.path.basename(filepath)
 
-    translator = Veloce if args['--veloce'] else Compliant
-    options = {'translator_class': translator,
-               'requirejs': args['--requirejs'],
-               'deep': args['--deep'],
-               }
+    with open(os.path.join(dirname, basename)) as f:
+        input = f.read()
 
-    outfile = args['--output']
-    if outfile:
-        with open(outfile, 'w') as output:
-            for filepath in filepaths:
-                pythonium_generate_js(filepath, output=output, **options)
-    else:
-        for filepath in filepaths:
-            pythonium_generate_js(filepath, output=sys.stdout, **options)
+    # generate javascript
+    tree = parse(input)
+    translator = Compliant()
+    translator.visit(tree)
+    output = translator.writer.value()
+    print(output)
 
 
 if __name__ == '__main__':
