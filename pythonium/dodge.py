@@ -1,5 +1,5 @@
-#!/usr/bin/env python3.3
-# Amirouche Boubekki & contributors (see AUTHORS) 2013-2014
+#!/usr/bin/env python3
+# Amirouche Boubekki & contributors (see AUTHORS) 2013-2016
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -28,7 +28,7 @@ from ast import FunctionDef
 from ast import NodeVisitor
 
 
-VERSION = '14.09-dev'
+VERSION = '16.01-dev'
 
 
 class YieldSearch(NodeVisitor):
@@ -94,7 +94,7 @@ class Dodge(NodeVisitor):
     #      | For | While | If | With | Raise | Try | Assert | Import | ImportFrom
     #      | Global | Nonlocal | Expr | Pass | Break | Continue
     #
-    # expr = BoolOp | BinOp | UnaryOp | Lambda | IfExp | Dict | Set 
+    # expr = BoolOp | BinOp | UnaryOp | Lambda | IfExp | Dict | Set
     #      | ListComp | SetComp | DictComp | GeneratorExp | Yield | YieldFrom
     #      | Compare | Call | Num | Str | Bytes | Ellipsis | Attribute
     #      | Subscript | Starred | Name | List | Tuple
@@ -117,7 +117,7 @@ class Dodge(NodeVisitor):
     # excepthandler = ExceptHandler(expr? type, identifier? name, stmt* body)
     #
     # arguments = (arg* args, identifier? vararg, expr? varargannotation,
-    #              arg* kwonlyargs, identifier? kwarg, expr? kwargannotation, 
+    #              arg* kwonlyargs, identifier? kwarg, expr? kwargannotation,
     #              expr* defaults, expr* kw_defaults)
     #
     # arg = (identifier arg, expr? annotation)
@@ -193,7 +193,7 @@ class Dodge(NodeVisitor):
     def visit_Tuple(self, node):
         return '[{}]'.format(', '.join(map(self.visit, node.elts)))
 
-    # List(expr* elts, expr_context ctx) 
+    # List(expr* elts, expr_context ctx)
     def visit_List(self, node):
         return '[{}]'.format(', '.join(map(self.visit, node.elts)))
 
@@ -332,7 +332,7 @@ class Dodge(NodeVisitor):
             self.writer.write('{} = {}({});'.format(node.name, decorator, node.name))
         self._function_stack.pop()
 
-    # Slice(expr? lower, expr? upper, expr? step) 
+    # Slice(expr? lower, expr? upper, expr? step)
     def visit_Slice(self, node):
         start = self.visit(node.lower) if node.lower else 'undefined'
         end = self.visit(node.upper) if node.upper else 'undefined'
@@ -343,7 +343,7 @@ class Dodge(NodeVisitor):
     def visit_Index(self, node):
         return self.visit(node.value)
 
-    # ExtSlice(slice* dims) 
+    # ExtSlice(slice* dims)
     def visit_ExtSlice(self, node): raise NotImplemented
 
     # Subscript(expr value, slice slice, expr_context ctx)
@@ -351,7 +351,7 @@ class Dodge(NodeVisitor):
         return '{}[{}]'.format(self.visit(node.value), self.visit(node.slice))
 
     # arguments = (arg* args, identifier? vararg, expr? varargannotation,
-    #              arg* kwonlyargs, identifier? kwarg, expr? kwargannotation, 
+    #              arg* kwonlyargs, identifier? kwarg, expr? kwargannotation,
     #              expr* defaults, expr* kw_defaults)
     def visit_arguments(self, node):
         # 'args', 'vararg', 'varargannotation', 'kwonlyargs', 'kwarg', 'kwargannotation', 'defaults', 'kw_defaults'
@@ -762,7 +762,7 @@ class Dodge(NodeVisitor):
     # For(expr target, expr iter, stmt* body, stmt* orelse)
     def visit_For(self, node):
         # support only arrays
-        target = node.target.id 
+        target = node.target.id
         iterator_index = target + '_iterator_index'
         iterator = self.visit(node.iter) # iter is the python iterator
         iterator_name = 'iterator_{}'.format(target)
@@ -808,8 +808,8 @@ class Dodge(NodeVisitor):
             position = num_args + index - 1
             self.writer.write('if (varkwargs_start !== undefined && {} > varkwargs_start) {{'.format(position))
             self.writer.push()
- 
-            self.writer.write('{} = {}[{}] || {};'.format(keyword, varkwargs, keyword, kwargs[keyword])) 
+
+            self.writer.write('{} = {}[{}] || {};'.format(keyword, varkwargs, keyword, kwargs[keyword]))
             self.writer.pull()
             self.writer.write('} else {')
             self.writer.push()
@@ -839,7 +839,7 @@ class Dodge(NodeVisitor):
         self.writer.write('}')
         return name
 
-    # ClassDef(identifier name, expr* bases, keyword* keywords, 
+    # ClassDef(identifier name, expr* bases, keyword* keywords,
     #          expr? starargs, expr? kwargs, stmt* body, expr* decorator_list)
     def visit_ClassDef(self, node):
         # 'name', 'bases', 'keywords', 'starargs', 'kwargs', 'body', 'decorator_lis't
