@@ -13,6 +13,10 @@
 
 # You should have received a copy of the GNU Lesser General Public
 # License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""dodge.py
+
+Javascript dressed in Python aka. Python syntax with javascript semantic.
+"""
 import os
 import sys
 from io import StringIO
