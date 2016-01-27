@@ -110,6 +110,8 @@ def any(iterable):
 
 
 def callable(obj):
+    if jscode("obj.__is_generator"):
+        return True
     if jscode("{}.toString.call(obj) == '[object Function]'"):
         return True
     if jscode('obj.__metaclass__ !== undefined'):

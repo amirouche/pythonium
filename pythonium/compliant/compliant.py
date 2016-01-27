@@ -334,6 +334,10 @@ class Compliant(NodeVisitor):
         for decorator in node.decorator_list:
             decorator = self.visit(decorator)
             self.writer.write('{} = {}({});'.format(name, decorator, name))
+
+        if has_yield:
+            self.writer.write('{}.__is_generator = true;'.format(name))
+
         self._def_stack.pop()
 
         self.writer.write('')
