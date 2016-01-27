@@ -294,7 +294,7 @@ class Compliant(NodeVisitor):
 
         self._unpack_arguments(args, kwargs, varargs, varkwargs)
 
-        # check for variable creation use var if not global
+        # check for variable creation, use var if not global
         def retrieve_vars(body, vars=None):
             local_vars = set()
             global_vars = vars if vars else set()
